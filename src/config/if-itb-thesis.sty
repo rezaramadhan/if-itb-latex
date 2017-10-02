@@ -14,7 +14,7 @@
 \special{papersize=210mm,297mm}
 
 % Setting margin
-\usepackage[top=3cm,bottom=2.5cm,left=4cm,right=2.5cm]{geometry}
+\usepackage[top=3cm,bottom=4cm,left=4cm,right=3cm]{geometry}
 
 \usepackage{mathptmx}
 
@@ -35,22 +35,46 @@
 \usepackage{titlesec}       % Package Format judul
 \usepackage{parskip}
 
+% set font to times new roman-ish
+\usepackage[T1]{fontenc}
+\usepackage{mathptmx}
+
 % Line satu setengah spasi
 \renewcommand{\baselinestretch}{1.5}
 
-% Setting judul
+% Setting nomor pada subbsubsubbab
+\setcounter{secnumdepth}{5}
+\setcounter{tocdepth}{5}
+
+% make table of content, list figure, list table uppercase
+\patchcmd{\tableofcontents}{\contentsname}{\MakeUppercase\contentsname}{}{}
+\patchcmd{\listoffigures}{\listfigurename}{\MakeUppercase\listfigurename}{}{}
+\patchcmd{\listoftables}{\listtablename}{\MakeUppercase\listtablename}{}{}
+
+
+% Setting judul format
 \chapterfont{\centering \Large}
 \titleformat{\chapter}[display]
-  {\Large\centering\bfseries}
+  {\fontsize{14}{17}\centering\bfseries}
   {\chaptertitlename\ \thechapter}{0pt}
-    {\Large\bfseries\uppercase}
+    {\fontsize{14}{17}\bfseries\uppercase}
+  \titlespacing*{\chapter}{0pt}{-50pt}{40pt}
 
-% Setting nomor pada subbsubsubbab
-\setcounter{secnumdepth}{3}
+\titlespacing*{\section} {0pt}{2.5ex plus 1ex minus .2ex}{1.3ex plus .2ex}
+\titlespacing*{\subsection} {0pt}{2.25ex plus 1ex minus .2ex}{0.5ex plus .2ex}
 
-\makeatletter
+% Set section, subsection, subsubsection font size
+\titleformat{\section}
+  {\normalfont\fontsize{12}{15}\bfseries}{\thesection}{1em}{}
+\titleformat{\subsection}
+  {\normalfont\fontsize{12}{15}\bfseries}{\thesubsection}{1em}{}
+\titleformat{\subsubsection}
+  {\normalfont\fontsize{12}{15}\bfseries}{\thesubsubsection}{1em}{}
 
-\makeatother
+
+% \makeatletter
+%
+% \makeatother
 
 % Counter untuk figure dan table.
 \counterwithin{figure}{section}

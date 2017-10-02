@@ -10,28 +10,21 @@
 %
 %--------------------------------------------------------------------%
 
-\documentclass[12pt, a4paper, onecolumn, oneside, final]{report}
+\documentclass[12pt, onecolumn, oneside, final]{book}
 
-\input{config/if-itb-thesis.sty}
-
-\makeatletter
-
-\makeatother
+\usepackage{config/if-itb-thesis}
 
 \bibliography{references}
 
 \begin{document}
-
+    \frontmatter
     %Basic configuration
-    \title{Panduan Tugas Akhir Informatika}
-    \date{}
+    \title{Kriptografi Paralel}
+    \date{Oktober 2017}
     \author{
-        Peb Ruswono Aryan \\
-        NIM 13502044
+        Muhammad Reza Ramadhan \\
+        NIM 13514107
     }
-
-    \pagenumbering{roman}
-    \setcounter{page}{0}
 
     \input{chapters/cover}
     \input{chapters/approval}
@@ -39,23 +32,17 @@
 
     \pagestyle{plain}
 
-    \input{chapters/abstract-id}
-    \input{chapters/abstract-en}
-    \input{chapters/forewords}
-
-    \titleformat*{\section}{\centering\bfseries\Large\MakeUpperCase}
+    % \input{chapters/abstract-id}
+    % \input{chapters/abstract-en}
+    % \input{chapters/forewords}
 
     \tableofcontents
     \listoffigures
     \listoftables
 
-    \titleformat*{\section}{\bfseries\Large}
-    \pagenumbering{arabic}
-
     %----------------------------------------------------------------%
     % Konfigurasi Bab
     %----------------------------------------------------------------%
-    \setcounter{page}{0}
     \renewcommand{\chaptername}{BAB}
     \renewcommand{\thechapter}{\Roman{chapter}}
     %----------------------------------------------------------------%
@@ -64,6 +51,10 @@
     % Dafter Bab
     % Untuk menambahkan daftar bab, buat berkas bab misalnya `chapter-6` di direktori `chapters`, dan masukkan ke sini.
     %----------------------------------------------------------------%
+
+    % Set numbering
+    \mainmatter
+
     \input{chapters/chapter-1}
     \input{chapters/chapter-2}
     \input{chapters/chapter-3}
