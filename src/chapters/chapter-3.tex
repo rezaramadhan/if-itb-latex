@@ -1,10 +1,34 @@
-\chapter{Analisis dan Perancangan}
+\chapter{Rencana Penyelesaian Masalah}
 
-\section{Analisis Masalah}
-\blindtext
+\section{Analisis Kinerja TLS}
+Penggunaan TLS pada sebuah infrastrukur internet dapat membantu penjaminan keamanan dari proses keluar masuknya data. Namun, penggunaan TLS memilki harga yang mahal secara komputasi yang dilakukan, sehingga membuat kinerjanya sendiri lambat. Pengurangan kinerja dari penggunaan TLS sendiri berdampak pada 3.4 hingga 9 kali dibandingkan dengan deployment tanpa penggunaan TLS (Coarfa et. al, 2006). Mengingat beberapa tipe website seperti personal blog, portal berita, ataupun search engine tidak benar-benar membutuhkan keamanan informasi, tidak sedikit dari situs tersebut yang memilih untuk tidak menggunakan TLS demi mendapatkan kinerja yang maksimal.
 
-\section{Solusi Umum}
-\blindtext
+Proses TLS dapat dibagi menjadi dua bagian, yaitu proses TLS Handshake yang dilakukan saat membuat sebuah koneksi TLS, serta proses pertukaran data yang dilakukan setelah TLS Handshake selesai dilakukan. Berdasarkan eksperimen yang dilakukan, Coarfa (2006) menyatakan bahwa CPU melakukan lebih banyak pekerjaan untuk menyelesaikan TLS Handshake dibandingkan dengan proses pertukaran data. Hal ini menyatakan bahwa TLS Handshake berdampak lebih besar pada kinerja sebuah TLS server dibandingkan dengan pertukaran data.
 
-\section{Rancangan Solusi}
-\blindtext
+Penggunaan alogritma kriptografi kunci publik pada proses pertukaran kunci  dalam TLS Handshake adalah proses yang membutuhkan komputasi cukup besar, dimana proses tersebut mengambil 13-59% dari seluruh proses komputasi pada TLS. Selain itu, proses komputasi kriptografi lainnya seperti RC4, MD5, ataupun pembangkitan nomor random sudah cukup seimbang dan tidak memerlukan banyak komputasi pada TLS (Coarfa et. al, 2006).
+
+  \subsection{Kelemahan Solusi Saat Ini}
+    \subsubsection{SSLProxy}
+    Salah satu solusi untuk memperbaiki kinerja TLS Handshake yang saat ini tersedia adalah SSLProxy yang diusulkan oleh Keon Jang et.al. Solusi ini adalah solusi yang efektif mengingat peningkatan jumlah TPS hingga 2.3 kali lipat. Namun, solusi ini memiliki beberapa kekurangan yang menyebabkan SSLProxy belum umum digunakan pada environment webserver pada masa kini.
+
+    Salah satu masalah SSLProxy adalah diperlukannya GPU sebagai salah satu alat implementasinya. Namun, penggunaan GPU pada datacenter bukan merupakan salah satu hal yang biasa. Mengingat biaya tambahan yang dibutuhkan untuk menambahkan perangkat keras khusus yang perlu digunakan untuk memperbaiki kinerja TLS, penggunaan SSLProxy saat ini bukan merupakan hal yang ideal untuk dilakukan.
+
+    Selain itu, penggunaan proxy sendiri merupakan salah satu kelemahan dari implementasi ini. Penambahan network latency serta perlunya penggunaan jalur komunikasi yang aman antara node dan proxy adalah salah dua kelemahan yang perlu dipertimbangann sebelum menerapkan SSLProxy.
+
+
+    \subsubsection{Modifikasi Protokol TLS Handshake}
+    Solusi lain yang dapat digunakan untuk meningkatkan kinerja TLS adalah untuk mengubah protokol TLS Handshake dengan beberapa cara tertentu, dintaranya adalah: membuat proses fast handshake; melakukan rebalancing TLS sehingga TLS client mendapatkan proses komputasi yang lebih besar dari pada TLS server saat terjadi TLS handshake; mengoptimasikan penggunaan kembali TLS session; serta melakukan batching pada komputasi RSA yang terjadi pada server.
+
+    Setiap solusi tersebut dapat meningkatkan kinerja TLS dengan cukup baik. Namun, sebagian besar solusi tersebut relatif sulit untuk diimplementasikan secara standar mengingat implementasinya sendiri memerlukan pemanfaatan protokol modifikasi tersebut baik pada server maupun client. Implementasi pada server relatif mudah untuk dilakukan, namun implementasi protokol baru pada client memerlukan kerjasama dengan berbagai TLS client seperti browser, https proxy, ataupun network middlebox.
+
+\section{Rancangan Pengembangan}
+Solusi yang diusulkan pada tugas akhir ini adalah untuk mencoba menerapkan algortima paralel RSA menggunakan implementasi Repeated-Square-and-Multiply untuk mempersingkat waktu komputasi RSA pada TLS handshake. Selain itu, penggunaan Residue Number System diharapkan dapat membantu proses komputasi big integer yang dibutuhkan dalam RSA.
+
+Implementasi TLS yang akan dimanfaatkan sebagai kakas percobaan adalah implementasi TLS1.2 yang tersedia pada OpenSSL versi 1.0.2g. Penggunaan algoritma Repeated-Square-and-Multiply akan diterapkan pada modul RSA yang digunakan pada proses TLS Handshake, sementara itu Residue Number System akan diterapkan pada modul Big Integer yang ada pada OpenSSL.
+
+Implementasi Repeated-Square-and-Multiply dalam pemrograman paralel sendiri akan dibantu oleh kakas OpenMP 4.5. Penggunaan OpenMP digunakan mengingat OpenMP adalah salah satu kakas pemrograman paralel yang sudah lazim digunakan dalam pemrograman paralel. Selain itu, OpenMP menggunakan bahasa C yang juga digunakan oleh OpenSSL, sehingga implementasi dapat dilakukan dengan mudah.
+
+\section{Rancangan Pengujian}
+Setelah implementasi dilakukan, pengujian akan dilakukan dengan stress test pada protokol HTTPS dari sebuah website. Akan dibuat dua buah website sederhana, satu website akan menggunakan library OpenSSL yang telah dimodifikasi pada tugas akhir ini, serta website yang lain akan menggunakan library OpenSSL awal. Kedua website tersebut akan menggukan aplikasi web server yang sama serta berada pada dua komputer dengan spesifikasi identik dan lokasi fisik yang berdekatan sehingga dapat mengurangi variabel yang berpengaruh dalam percobaan ini.
+
+Stress test akan dilakukan dengan kakas ApacheBench. Beberapa hasil yang ingin didapat pada percobaan ini adalah perbandingan TPS, latency, serta penggunaan CPU serta disk I/O pada masing-masing website tersebut.
