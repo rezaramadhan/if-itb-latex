@@ -3,22 +3,20 @@
 
 \section{Latar Belakang}
 
-Transport Layer Security (TLS) merupakan sebuah protokol yang banyak digunakan untuk menjamin keamanan dan kerahasiaan dari sebuah pesan yang dikirim melalui jaringan. Saat ini, TLS digunakan sebagai sebuah layer security dari berbagai protokol yang saat ini umum digunakan di Internet seperti Hyper-Text Transfer Protocol (HTTP), File Transfer Protocol (FTP), ataupun Simple Mail Transfer Protocol (SMTP). Mengingat posisi protokol ini sebagai sebuah layer yang berbeda dibandingkan protokol-protokol lain yang digunakan dalam perangkat lunak, TLS juga dapat digunakan dalam protokol lain yang mungkin dibuat pada masa yang akan datang.
+Transport Layer Security (TLS) merupakan sebuah protokol yang berguna untuk menjamin keamanan dan kerahasiaan dari sebuah pesan yang dikirim melalui jaringan. Saat ini, TLS umum digunakan sebagai sebuah layer security dari berbagai protokol yang saat ini umum digunakan di Internet seperti Hyper-Text Transfer Protocol (HTTP), File Transfer Protocol (FTP), ataupun Simple Mail Transfer Protocol (SMTP). Mengingat posisi TLS adalah sebuah layer yang berbeda dibandingkan protokol-protokol lain, TLS juga dapat digunakan sebagai tambahan dari protokol lain yang mungkin dibuat pada masa yang akan datang.
 
-Secara sederhana, sebuah koneksi TLS akan didahului dengan adanya TLS handshake untuk menentukan symmetric key yang akan digunakan oleh client dan server untuk berkomunikasi setelahnya. Sayangnya, waktu yang digunakan untuk TLS handshake masih cukup signifikan. Penggunaan TLS diatas HTTP dapat mengakibatkan waktu load pada sebuah website menjadi 1,2 hingga 3 kali lebih lambat (Naylor et al, 2014). Hal ini merupakan salah satu alasan kenapa saat ini TLS belum digunakan oleh seluruh layanan yang ada di internet.
+Secara sederhana, sebuah koneksi TLS akan didahului dengan adanya TLS handshake untuk menentukan symmetric key dan cipher yang akan digunakan oleh client dan server untuk berkomunikasi setelahnya. Sayangnya, waktu yang digunakan untuk TLS handshake masih cukup signifikan; penggunaan TLS di atas HTTP dapat mengakibatkan waktu load pada sebuah website menjadi 1,2 hingga 3 kali lebih lambat dibandingkan dengan website yang tidak menggunakan TLS (Naylor et al, 2014). Hal ini merupakan salah satu alasan kenapa saat ini TLS belum digunakan oleh seluruh layanan yang ada di internet.
 
-Pada sebuah TLS handshake, client akan melakukan koneksi terhadap server untuk menandakan bahwa ia ingin membuat sebuah TLS session baru yang akan digunakan untuk pengiriman data antara client dan server. Server kemudian akan membalas koneksi tersebut dengan sebuah certificate berisi public key miliknya. Client kemudian akan membuat sebuah pre-master symmetric key yang akan dienkripsi dengan public key yang diterima. Server kemudian akan mendekripsi data yang ia terima untuk mendapat pre-master symmetric key; pre-master symmetric key akan dilakukan komputasi lebih jauh untuk mendapatkan symmetric key yang akan digunakan pada komunikasi antara server dan client.
-
-Dari beberapa langkah yang dilakukan dalam sebuah TLS handshake, komputasi dekripsi algoritma Rivest–Shamir–Adleman (RSA) merupakan salah satu bagian dapat dioptimasi dengan relatif mudah.  Terdapat beberapa cara yang telah disarankan untuk meningkatkan kinerja TLS handshake seperti melakukan batching pada dekripsi RSA di server, melakukan rebalancing sehingga komputasi pada client lebih sulit daripada server, ataupun melakukan optimisasi pada algoritma RSA sehingga komputasi dapat dilakukan dengan lebih cepat.
+Terdapat beberapa metode yang telah disarankan untuk meningkatkan kinerja TLS handshake seperti melakukan batching pada komputasi RSA di server, melakukan rebalancing sehingga komputasi pada client lebih sulit daripada server, ataupun melakukan optimisasi pada algoritma Rivest–Shamir–Adleman (RSA) dengan pemrograman paralel sehingga komputasi dapat dilakukan dengan lebih cepat. Dari beberapa metode yang telah disarankan tersebut, optimasi algoritma RSA dengan pemrograman paralel merupakan salah satu bagian dapat dioptimasi dengan relatif mudah dan tanpa mengubah protokol TLS secara signifikan.
 
 Saat ini telah terdapat beberapa implementasi RSA dalam algoritma pemrograman paralel baik dalam paralel dalam Central Processing Unit (CPU) maupun dalam Graphics Processing Unit (GPU). Pembuatan algoritma RSA secara multiprocessing dalam GPU bukanlah hal yang baru dan dapat menghasilkan troughput hingga 45 kali dari implementasi RSA pada CPU (Zhang et al, 2014). Namun mengingat sebagian besar server pada data center tidak memilki GPU, implementasi RSA pada GPU tidak dapat digunakan untuk meningkatkan kinerja TLS handshake.
 
-Dewasa ini, penggunaan CPU dengan jumlah core yang tinggi pada server merupakan hal yang lumrah; seri Xeon dari Intel telah menyediakan jumlah core hingga 22. Jumlah core yang tinggi merupakan salah satu alasan mengapa penggunaan algoritma multiprocessing pada dekripsi RSA dapat meningkatkan kinerja dari sebuah TLS handshake.
+Dewasa ini, penggunaan CPU dengan jumlah core yang tinggi pada server merupakan hal yang lumrah; Intel menyediakan CPU seri Xeon yang memiliki jumlah core hingga 22. Jumlah core yang tinggi merupakan salah satu alasan mengapa penggunaan pemrograman paralel melalui CPU pada komputasi RSA dapat meningkatkan kinerja dari sebuah TLS handshake.
 
 
 \section{Rumusan Masalah}
 
-Kinerja dari TLS handshake hingga saat ini masih merupakan salah satu hal yang menghambat implementasi TLS secara luas. Salah satu cara untuk meningkatkan kinerja dari TLS handshake adalah dengan melakukan optimasi pada algoritma dekripsi RSA. Akan tetapi, optimisasi algoritma RSA menggunakan pemrograman paralel pada CPU bukan merupakan topik yang banyak dibahas pada penelitian-penelitian saat ini. Maka dari itu, tugas akhir ini akan berfokus pada pengembangan algoritma RSA dalam pemrograman paralel dan implementasinya pada TLS handshake. Dalam pengembangannya, terdapat berapa masalah yang akan menjadi perhatian utama dalam tugas akhir ini, yaitu:
+Sesuai dengan pembahasan yang ada pada latar belakang, diketahui bahwa optimasi algoritma RSA dengan menggunakan pemrograman paralel merupakan salah satu metode yang dapat digunakan untuk meningkatkan kinerja TLS Handshake. Maka dari itu, tugas akhir ini akan berfokus pada pengembangan algoritma RSA dalam pemrograman paralel dan implementasinya pada TLS handshake. Dalam pengembangannya, terdapat berapa masalah yang akan menjadi perhatian utama dalam tugas akhir ini, yaitu:
 
 \begin{enumerate}
   \item Algoritma paralel seperti apa yang akan diimplementasikan?
@@ -28,17 +26,22 @@ Kinerja dari TLS handshake hingga saat ini masih merupakan salah satu hal yang m
 
 \section{Tujuan}
 
-Tujuan dari tugas akhir ini adalah menemukan sebuah algoritma paralel RSA yang dapat diimplementasikan pada TLS handshake. Dengan adanya algoritma paralel tersebut, diharapkan bahwa kinerja dari TLS handshake akan meningkat dan penggunaan TLS pada internet akan semakin banyak digunakan.
+Dalam penyelesaian tugas akhir ini terdapat beberapa tujuan yang akan dicapai, yaitu:
+\begin{enumerate}
+  \item Menemukan dan mengimplementasikan algoritma RSA dalam pemgrograman paralel.
+  \item Mengintegrasikan algoritma RSA tersebut pada sebuah implementasi protokol TLS.
+  \item Mengukur peningkatan kinerja dari TLS handshake setelah mengimplementasikan algoritma paralel RSA.
+\end{enumerate}
 
 \section{Batasan Masalah}
 
-Tugas akhir ini hanya membahas mengenai optimisasi algoritma RSA pada implementasi TLS handshake. Dengan demikian, tugas akhir tidak memperhatikan hal-hal berikut:
+Tugas akhir ini akan membahas mengenai optimisasi algoritma RSA pada sebuah implementasi TLS handshake. Adapun batasan masalah yang terdapat pada tugas akhir ini adalah:
 
 \begin{enumerate}
-  \item Protokol pertukaran kunci TLS handshake.
-  \item Proses pemilihan dan/atau pembuatan cipher suite, TLS session, dan simmetric key pada TLS.
-  \item Proses enkripsi pre-master symmetric key pada TLS client.
-  \item Kompresi data.
+  \item Implementasi algoritma paralel RSA tidak memperhatikan masalah keamanan pada sistem yang menggunakannya.
+  \item Implementasi TLS memanfaatkan perangkat lunak opensource OpenSSL versi 1.0.2g.
+  \item Compiler yang digunakan untuk melakukan kompilasi program adalah gcc versi 5.4.0.
+  \item CPU yang digunakan pada implementasi ini adalah Intel 64-bit dengan minimal jumlah core 16.
 \end{enumerate}
 
 \section{Metodologi}
